@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Phone, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BrandLoader } from "@/components/ui/brand-loader"
+import { ImageWithLoader } from "@/components/ui/image-with-loader"
 import { RelatedProducts } from "@/components/product/related-products"
 import { createProxyImageUrl } from "@/utils/image-proxy"
 
@@ -202,11 +203,12 @@ export default function ProductDetail() {
           {/* Galería de imágenes del producto */}
           <div className="space-y-6">
             <div className="relative h-[500px] overflow-hidden rounded-lg">
-              <Image 
+              <ImageWithLoader 
                 src={productImages[selectedImageIndex]} 
                 alt={productName} 
                 fill 
                 className="object-contain" 
+                skeletonClassName="rounded-lg"
               />
               
               {/* Botones de navegación - solo mostrar si hay múltiples imágenes */}
@@ -255,11 +257,12 @@ export default function ProductDetail() {
                         : 'border-zinc-200 hover:border-zinc-400'
                     }`}
                   >
-                    <Image
+                    <ImageWithLoader
                       src={image}
                       alt={`Vista ${index + 1} de ${productName}`}
                       fill
                       className="object-contain"
+                      skeletonClassName="rounded-lg"
                     />
                   </button>
                 ))}

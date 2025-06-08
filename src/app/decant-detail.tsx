@@ -7,6 +7,7 @@ import { ArrowLeft, Phone, Mail, Droplets, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
+import { ImageWithLoader } from "@/components/ui/image-with-loader"
 import { RelatedProducts } from "@/components/product/related-products"
 import { createProxyImageUrl } from "@/utils/image-proxy"
 
@@ -177,11 +178,12 @@ export default function DecantDetail() {
             className="space-y-6"
           >
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-xl">
-              <Image 
+              <ImageWithLoader 
                 src={decantImages[selectedImageIndex]} 
                 alt={getDecantName(decant)} 
                 fill 
                 className="object-contain md:p-6 lg:p-8" 
+                skeletonClassName="rounded-lg"
               />
               
               {/* Badge flotante */}
@@ -206,11 +208,12 @@ export default function DecantDetail() {
                       : 'border-zinc-200 hover:border-zinc-400'
                   }`}
                 >
-                  <Image
+                  <ImageWithLoader
                     src={image}
                     alt={`Vista ${index + 1} de ${decant.Nombre}`}
                     fill
                     className="object-contain md:p-2 rounded-lg"
+                    skeletonClassName="rounded-lg"
                   />
                 </motion.button>
               ))}

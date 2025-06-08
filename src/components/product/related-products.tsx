@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { BrandLoader } from "@/components/ui/brand-loader"
+import { ImageWithLoader } from "@/components/ui/image-with-loader"
 import { Button } from "@/components/ui/button"
 import { processMultipleImageUrls } from "@/utils/image-proxy"
 
@@ -141,12 +141,13 @@ export function RelatedProducts({ currentProductId, currentProductType, maxProdu
         {relatedProducts.map((product) => (
           <div key={getProductId(product)} className="group cursor-pointer" onClick={() => handleProductClick(product)}>
             <div className="w-full h-[250px] bg-white border border-zinc-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
-              <Image
+              <ImageWithLoader
                 src={getProductImage(product)}
                 alt={getProductName(product)}
                 width={250}
                 height={250}
                 className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                skeletonClassName="rounded-lg"
               />
             </div>
 

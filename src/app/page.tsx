@@ -12,6 +12,7 @@ import { Search, Instagram, Facebook, ChevronLeft, ChevronRight } from "lucide-r
 
 import { Toaster } from "sonner"
 import { useRouter } from "next/navigation"
+import { ImageWithLoader } from "@/components/ui/image-with-loader"
 import { processMultipleImageUrls, createProxyImageUrl } from "@/utils/image-proxy"
 
 // Constantes para el swipe
@@ -23,7 +24,7 @@ const carouselItems = [
     id: 1,
     title: "Fragancias que definen tu personalidad",
     description: "Descubre nuestra colección exclusiva de perfumes que expresan tu esencia",
-    image: "/catalogo_5.PNG",
+    image: "https://i.imgur.com/iOAK7QP.png",
     cta: "Explorar Fragancias",
   },
   {
@@ -579,11 +580,12 @@ export default function LandingPage() {
                         transition={{ duration: 0.7, delay: 0.1 }}
                         className="relative h-[450px] sm:h-[380px] lg:h-[400px] mx-4 mb-8 rounded-3xl overflow-hidden"
                       >
-                        <Image
+                        <ImageWithLoader
                           src={carouselItems[currentSlide].image}
                           alt={carouselItems[currentSlide].title}
                           fill
                           className="object-contain md:p-4 lg:p-6 group-hover:scale-105 transition-transform duration-700 ease-out"
+                          priority
                         />
                         
                         {/* Minimal gradient overlay */}
@@ -936,11 +938,12 @@ export default function LandingPage() {
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white group-hover:shadow-xl transition-all duration-500 relative">
                     
                     <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
-                      <Image
+                      <ImageWithLoader
                         src={getProductImage(product)}
                         alt={getProductName(product)}
                         fill
                         className="object-cover md:p-2 lg:p-4 group-hover:scale-105 transition-transform duration-700 ease-out"
+                        skeletonClassName="rounded-t-2xl"
                       />
                       
                       {/* Enhanced background pattern */}
@@ -1225,11 +1228,12 @@ export default function LandingPage() {
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white group-hover:shadow-xl transition-all duration-500 relative">
                     
                     <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
-                      <Image
+                      <ImageWithLoader
                         src={getDecantImage(decant)}
                         alt={getDecantName(decant)}
                         fill
                         className="object-cover md:p-2 lg:p-4 group-hover:scale-105 transition-transform duration-700 ease-out"
+                        skeletonClassName="rounded-t-2xl"
                       />
                       
                       {/* Enhanced background pattern */}
