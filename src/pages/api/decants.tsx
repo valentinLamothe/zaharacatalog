@@ -1,4 +1,6 @@
 import { google } from "googleapis"
+import path from "path"
+import fs from "fs"
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,17 +12,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Obtener parámetros de la URL
     const { id } = req.query
 
-    // Cargar credenciales desde variables de entorno
-    const credentials = {
-      type: "service_account",
-      project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
-      private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-    }
+        // Cargar credenciales: variables de entorno (producción) o archivo local (desarrollo)
+    let credentials
 
-    // Verificar que las credenciales estén configuradas
-    if (!credentials.project_id || !credentials.private_key || !credentials.client_email) {
-      return res.status(500).json({ error: "Google Sheets credentials not configured" })
+    if (process.env.GOOGLE_SHEETS_PRIVATE_KEY && process.env.GOOGLE_SHEETS_CLIENT_EMAIL) {
+      // Usar variables de entorno (para producción/Vercel)
+      credentials = {
+        type: "service_account",
+        project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
+        private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+      }
+    } else {
+      // Usar archivo credentials.json (para desarrollo local)
+      try {
+        const credentialsPath = path.join(process.cwd(), "credentials.json")
+        credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf8"))
+      } catch {
+        return res.status(500).json({ 
+          error: "Google Sheets credentials not configured. Please set environment variables or add credentials.json file." 
+        })
+      }
     }
 
     // Autenticación
