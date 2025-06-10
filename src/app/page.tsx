@@ -29,16 +29,16 @@ const carouselItems = [
   },
   {
     id: 2,
-    title: "(3x2 en decants)",
+    title: "3x2 en decants",
     description: "Llevando 3 del mismo precio te llevas uno de REGALO.",
     image: "https://i.imgur.com/vzXpL0d.png",
     cta: "Aprovechalo ya",
   },
   {
     id: 3,
-    title: "Elegancia en cada esencia",
-    description: "Fragancias exclusivas que complementan tu personalidad con distinción",
-    image: "/catalogo_7.PNG",
+    title: "Club de Nuit: intensidad bajo cero.",
+    description: "Frescura potente con un estilo que deja huella. Elegante, profundo y siempre inolvidable.",
+    image: "https://i.imgur.com/VBflVVx.jpeg",
     cta: "Descubrir Fragancias",
   },
 ]
@@ -285,14 +285,14 @@ export default function LandingPage() {
     setCurrentSlide((prev) => (prev === 0 ? carouselItems.length - 1 : prev - 1))
   }, [])
 
-  // Auto-advance carousel - más frecuente en mobile
+  // Auto-advance carousel - 6 segundos para todas las pantallas
   useEffect(() => {
     const isMobile = window.innerWidth < 768
     const interval = setInterval(() => {
       if (!isHovered || isMobile) { // En mobile siempre avanza automáticamente
         nextSlide()
       }
-    }, isMobile ? 3000 : 5000) // 3 segundos en mobile, 5 en desktop
+    }, 6000) // 6 segundos para todas las pantallas
     return () => clearInterval(interval)
   }, [nextSlide, isHovered])
 
@@ -812,7 +812,16 @@ export default function LandingPage() {
                             <Button
                               size="lg"
                               className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-8 py-3 text-base font-medium border-0 shadow-xl transition-all duration-300 relative overflow-hidden group"
-                              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                              onClick={() => {
+                                const currentId = carouselItems[currentSlide].id
+                                if (currentId === 1 || currentId === 2) {
+                                  // Botones 1 y 2 van a decants
+                                  document.getElementById('decants')?.scrollIntoView({ behavior: 'smooth' })
+                                } else if (currentId === 3) {
+                                  // Botón 3 va a fragancias
+                                  document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+                                }
+                              }}
                             >
                               <motion.div
                                 className="absolute inset-0 bg-white/20 rounded-full"
@@ -937,7 +946,16 @@ export default function LandingPage() {
                           <Button
                             size="lg"
                             className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-none px-8 py-4 text-sm tracking-wider uppercase font-light border-0 shadow-2xl transition-all duration-500 relative overflow-hidden group"
-                            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => {
+                              const currentId = carouselItems[currentSlide].id
+                              if (currentId === 1 || currentId === 2) {
+                                // Botones 1 y 2 van a decants
+                                document.getElementById('decants')?.scrollIntoView({ behavior: 'smooth' })
+                              } else if (currentId === 3) {
+                                // Botón 3 va a fragancias
+                                document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+                              }
+                            }}
                           >
                             {/* Shimmer effect */}
                             <motion.div

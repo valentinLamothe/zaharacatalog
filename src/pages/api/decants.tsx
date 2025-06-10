@@ -1,6 +1,3 @@
-import { google } from "googleapis"
-import path from "path"
-import fs from "fs"
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -12,95 +9,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Obtener parámetros de la URL
     const { id } = req.query
 
-        // Cargar credenciales: variables de entorno (producción) o archivo local (desarrollo)
-    let credentials
+    // Usar Google Sheets public CSV export para la hoja de decants (sin autenticación)
+    const spreadsheetId = "1a27X7S89kCKffvT690ZAUF9gc6ceer1LGS-bvnchJh8"
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=150551897`
 
-    if (process.env.GOOGLE_SHEETS_PRIVATE_KEY && process.env.GOOGLE_SHEETS_CLIENT_EMAIL) {
-      // Usar variables de entorno (para producción/Vercel)
-      credentials = {
-        type: "service_account",
-        project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
-        private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-      }
-    } else {
-      // Usar archivo credentials.json (para desarrollo local)
-      try {
-        const credentialsPath = path.join(process.cwd(), "credentials.json")
-        credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf8"))
-      } catch {
-        return res.status(500).json({ 
-          error: "Google Sheets credentials not configured. Please set environment variables or add credentials.json file." 
-        })
-      }
+    const response = await fetch(csvUrl)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    // Autenticación
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-    })
-
-    const sheets = google.sheets({ version: "v4", auth })
-    const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID || "1a27X7S89kCKffvT690ZAUF9gc6ceer1LGS-bvnchJh8"
-
-    // Usar la hoja específica de decants (gid=150551897)
-    // Primero obtenemos información del spreadsheet para encontrar el nombre de la hoja
-    const spreadsheetInfo = await sheets.spreadsheets.get({
-      spreadsheetId,
-    })
-
-    // Buscar la hoja con gid=150551897
-    const sheetsInfo = spreadsheetInfo.data.sheets || []
-    const targetSheet = sheetsInfo.find(sheet => 
-      sheet.properties?.sheetId === 150551897
-    )
-
-    if (!targetSheet) {
-      return res.status(404).json({ error: "Hoja de decants no encontrada" })
-    }
-
-    const sheetName = targetSheet.properties?.title || "Sheet2"
-    const range = `${sheetName}!A1:G100` // Columnas A-G según el spreadsheet
-
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range,
-      valueRenderOption: 'UNFORMATTED_VALUE' // Para obtener valores sin formato
-    })
-
-    const rows = response.data.values
-    if (!rows || rows.length < 2) {
+    const csvText = await response.text()
+    
+    // Parsear CSV
+    const lines = csvText.trim().split('\n')
+    if (lines.length < 2) {
       return res.status(404).json({ error: "No se encontraron datos de decants" })
     }
 
-    // Extraer encabezados (primera fila)
-    const headers = rows[0]
+    // Extraer encabezados (primera fila) - parsear CSV correctamente
+    const headers = lines[0].split(',').map((header: string) => header.replace(/"/g, '').trim())
 
     // Procesar los datos desde la segunda fila
-    const decants = rows.slice(1).map((row) => {
+    const decants = lines.slice(1).map((line: string) => {
+      const values = line.split(',').map((value: string) => value.replace(/"/g, '').trim())
       const obj: Record<string, string | number | null> = {}
-      headers.forEach((header, index) => {
+      
+      headers.forEach((header: string, index: number) => {
+        const value = values[index] || ""
+        
         // Convertir valores numéricos cuando sea apropiado
         if (header === "id" || header === "ID de artículo") {
-          obj[header] = row[index] ? Number.parseInt(row[index], 10) : 0
+          obj[header] = value ? Number.parseInt(value, 10) : 0
         } else if (header === "Precio 5 ML" || header === "Precio 10 Ml") {
           // Manejo de precios que vienen como números desde el spreadsheet
-          const value = row[index]
           if (value !== undefined && value !== null && value !== "") {
             obj[header] = Number.parseFloat(value.toString())
           } else {
             obj[header] = null
           }
         } else {
-          obj[header] = row[index] || ""
+          obj[header] = value || ""
         }
       })
       return obj
     })
 
     // Filtrar solo decants que tengan ID válido y nombre
-    const validDecants = decants.filter(decant => {
+    const validDecants = decants.filter((decant: Record<string, string | number | null>) => {
       const decantId = decant["id"]
       const decantName = decant["Nombre"]
       return decantId && 
@@ -112,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Si se proporciona un ID, devolver solo ese decant
     if (id) {
-      const decant = validDecants.find((d) => {
+      const decant = validDecants.find((d: Record<string, string | number | null>) => {
         const decantId = d["id"]
         return decantId?.toString() === id
       })
