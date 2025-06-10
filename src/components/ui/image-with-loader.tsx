@@ -40,8 +40,11 @@ export function ImageWithLoader({
     setHasError(true)
   }
 
+  // Default sizes for fill images
+  const defaultSizes = fill ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" : undefined
+
   return (
-    <div className="relative w-full h-full">
+    <div className={cn("relative w-full h-full", fill && "overflow-hidden")}>
       {/* Skeleton loader */}
       {isLoading && (
         <motion.div
@@ -112,6 +115,7 @@ export function ImageWithLoader({
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
         transition={{ duration: 0.3 }}
+        className={cn(fill && "relative w-full h-full")}
       >
         <Image
           src={src}
@@ -121,7 +125,7 @@ export function ImageWithLoader({
           height={!fill ? height : undefined}
           className={className}
           priority={priority}
-          sizes={sizes}
+          sizes={sizes || defaultSizes}
           onLoad={handleLoad}
           onError={handleError}
         />

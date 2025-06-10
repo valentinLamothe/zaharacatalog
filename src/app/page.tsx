@@ -22,22 +22,22 @@ const minSwipeDistance = 50
 const carouselItems = [
   {
     id: 1,
-    title: "Fragancias que definen tu personalidad",
+    title: "Tus aromas favoritos en el tamaño ideal",
     description: "Descubre nuestra colección exclusiva de perfumes que expresan tu esencia",
     image: "https://i.imgur.com/iOAK7QP.png",
-    cta: "Explorar Fragancias",
+    cta: "Explorar Decants",
   },
   {
     id: 2,
-    title: "Aromas únicos para cada ocasión",
-    description: "Perfumes exclusivos que despiertan emociones y crean memorias inolvidables",
-    image: "/catalogo_6.PNG",
-    cta: "Ver Colección",
+    title: "(3x2 en decants)",
+    description: "Llevando 3 del mismo precio te llevas uno de REGALO.",
+    image: "https://i.imgur.com/vzXpL0d.png",
+    cta: "Aprovechalo ya",
   },
   {
     id: 3,
     title: "Elegancia en cada esencia",
-    description: "Fragancias premium que complementan tu personalidad con distinción",
+    description: "Fragancias exclusivas que complementan tu personalidad con distinción",
     image: "/catalogo_7.PNG",
     cta: "Descubrir Fragancias",
   },
@@ -58,6 +58,10 @@ export default function LandingPage() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [activeSection, setActiveSection] = useState<'fragancias' | 'decants'>('fragancias')
   const [searchDecants, setSearchDecants] = useState("")
+  const [particlePositions, setParticlePositions] = useState<Array<{left: string, top: string}>>([])
+  const [desktopParticlePositions, setDesktopParticlePositions] = useState<Array<{left: string, top: string}>>([])
+  const [mobileParticlePositions, setMobileParticlePositions] = useState<Array<{left: string, top: string}>>([])
+  const [isClient, setIsClient] = useState(false)
 
   const router = useRouter()
 
@@ -161,6 +165,32 @@ export default function LandingPage() {
   useEffect(() => {
     // Force scroll to top when component mounts (page load/refresh)
     window.scrollTo(0, 0)
+  }, [])
+
+  // Initialize particle positions only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsClient(true)
+    // Generate background particles (12)
+    setParticlePositions(
+      Array.from({ length: 12 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+      }))
+    )
+    // Generate desktop particles (8)
+    setDesktopParticlePositions(
+      Array.from({ length: 8 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+      }))
+    )
+    // Generate mobile particles (6) with fixed positions
+    setMobileParticlePositions(
+      Array.from({ length: 6 }, (_, i) => ({
+        left: `${20 + i * 15}%`,
+        top: `${10 + (i % 3) * 30}%`,
+      }))
+    )
   }, [])
 
   // Fetch products and decants
@@ -404,7 +434,7 @@ export default function LandingPage() {
               </div>
             </div>
             
-            {/* Premium Search bar in mobile */}
+            {/* Search bar in mobile */}
             <div className="relative">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-zinc-100/50 to-zinc-50/50 rounded-2xl blur-sm opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
@@ -508,15 +538,18 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section - Ultra Minimalist Carousel */}
+      {/* Hero Section - Advanced Animated Carousel */}
       <section className="relative overflow-hidden bg-gradient-to-br from-zinc-50/50 via-white to-zinc-50/30 min-h-screen">
-        {/* Subtle ambient lighting */}
+        {/* Advanced ambient lighting with multiple layers */}
         <div className="absolute inset-0 pointer-events-none">
+          {/* Main ambient light */}
           <motion.div 
             className="absolute top-1/3 right-1/3 w-[600px] h-[600px] bg-gradient-to-br from-zinc-100/30 to-transparent rounded-full blur-3xl"
             animate={{
               scale: [1, 1.05, 1],
               opacity: [0.4, 0.6, 0.4],
+              x: [0, 20, -10, 0],
+              y: [0, -15, 10, 0],
             }}
             transition={{
               duration: 12,
@@ -524,6 +557,46 @@ export default function LandingPage() {
               ease: "easeInOut"
             }}
           />
+          
+          {/* Secondary ambient light */}
+          <motion.div 
+            className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-zinc-200/20 to-transparent rounded-full blur-2xl"
+            animate={{
+              scale: [1, 1.1, 0.9, 1],
+              opacity: [0.3, 0.5, 0.2, 0.3],
+              x: [0, -30, 20, 0],
+              y: [0, 10, -25, 0],
+            }}
+            transition={{
+              duration: 15,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          
+          {/* Floating particles */}
+          {isClient && particlePositions.map((position, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-zinc-300/40 rounded-full"
+              style={{
+                left: position.left,
+                top: position.top,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0, 1, 0],
+                scale: [0, 1, 0],
+              }}
+              transition={{
+                duration: 3 + (i * 0.5) % 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: (i * 0.4) % 5,
+              }}
+            />
+          ))}
         </div>
         
         <div 
@@ -569,133 +642,441 @@ export default function LandingPage() {
               >
                 <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center">
                   
-                  {/* Mobile - Ultra Clean */}
+                  {/* Mobile - Advanced Animations */}
                   <div className="md:hidden w-full">
                     <div className="relative h-full flex flex-col justify-center py-24">
                       
-                      {/* Main image with subtle frame */}
+                      {/* Advanced image with 3D effects */}
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.7, delay: 0.1 }}
-                        className="relative h-[450px] sm:h-[380px] lg:h-[400px] mx-4 mb-8 rounded-3xl overflow-hidden"
+                        initial={{ 
+                          opacity: 0, 
+                          scale: 0.8, 
+                          rotateX: 25,
+                          y: 100,
+                          filter: "blur(10px)"
+                        }}
+                        animate={{ 
+                          opacity: 1, 
+                          scale: 1, 
+                          rotateX: 0,
+                          y: 0,
+                          filter: "blur(0px)"
+                        }}
+                        transition={{ 
+                          duration: 1.2, 
+                          delay: 0.2,
+                          ease: [0.25, 0.46, 0.45, 0.94]
+                        }}
+                        whileHover={{
+                          scale: 1.05,
+                          rotateY: 8,
+                          transition: { duration: 0.6, ease: "easeOut" }
+                        }}
+                        className="relative h-[450px] sm:h-[380px] lg:h-[320px] mx-4 mb-8 rounded-3xl overflow-hidden group"
+                        style={{
+                          transformStyle: "preserve-3d",
+                          perspective: "1000px"
+                        }}
                       >
-                        <ImageWithLoader
-                          src={carouselItems[currentSlide].image}
-                          alt={carouselItems[currentSlide].title}
-                          fill
-                          className="object-contain md:p-4 lg:p-6 group-hover:scale-105 transition-transform duration-700 ease-out"
-                          priority
+                        {/* Animated border glow */}
+                        <motion.div
+                          className="absolute inset-0 rounded-3xl"
+                          style={{
+                            background: "linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.1), transparent)",
+                            backgroundSize: "400% 400%"
+                          }}
+                          animate={{
+                            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                          }}
+                          transition={{
+                            duration: 8,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
                         />
                         
-                        {/* Minimal gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                        {/* Floating particles around image */}
+                        {isClient && mobileParticlePositions.map((position, i) => (
+                          <motion.div
+                            key={i}
+                            className="absolute w-1 h-1 bg-zinc-400/60 rounded-full"
+                            style={{
+                              left: position.left,
+                              top: position.top,
+                            }}
+                            animate={{
+                              y: [0, -15, 0],
+                              opacity: [0.3, 1, 0.3],
+                              scale: [0.5, 1.2, 0.5],
+                            }}
+                            transition={{
+                              duration: 2 + (i * 0.3) % 2,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                              delay: i * 0.3,
+                            }}
+                          />
+                        ))}
                         
-                        {/* Floating slide number */}
                         <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.5 }}
-                          className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center text-xs font-medium text-zinc-800"
+                          className="relative h-full w-full"
+                          whileHover={{
+                            z: 20,
+                            transition: { duration: 0.4 }
+                          }}
                         >
-                          {currentSlide + 1}
+                          <ImageWithLoader
+                            src={carouselItems[currentSlide].image}
+                            alt={carouselItems[currentSlide].title}
+                            fill
+                            className="object-contain md:p-4 lg:p-6 group-hover:scale-110 transition-transform duration-1000 ease-out"
+                            priority
+                          />
                         </motion.div>
+                        
+                        {/* Dynamic shadow effect */}
+                        <motion.div
+                          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100"
+                          style={{
+                            background: "radial-gradient(circle at center, rgba(0,0,0,0.1), transparent 60%)",
+                            filter: "blur(15px)",
+                            transform: "translateY(10px)"
+                          }}
+                          animate={{
+                            scale: [1, 1.1, 1],
+                          }}
+                          transition={{
+                            duration: 4,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        />
                       </motion.div>
 
-                      {/* Content */}
+                      {/* Enhanced content with staggered animations */}
                       <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
                         className="px-4 text-center space-y-6"
                       >
-                        <h1 className="text-3xl sm:text-4xl font-light text-zinc-900 leading-tight tracking-tight">
+                                                 <motion.h1 
+                           className="text-3xl sm:text-4xl font-light text-zinc-900 leading-tight tracking-tight"
+                           initial={{ opacity: 0, y: 30, rotateX: 15 }}
+                           animate={{ 
+                             opacity: 1, 
+                             y: 0, 
+                             rotateX: 0,
+                             backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                           }}
+                           transition={{ 
+                             duration: 0.8, 
+                             delay: 0.6,
+                             backgroundPosition: {
+                               duration: 6,
+                               repeat: Infinity,
+                               ease: "linear"
+                             }
+                           }}
+                           style={{
+                             background: "linear-gradient(135deg, #18181b, #52525b, #18181b)",
+                             backgroundSize: "200% 100%",
+                             WebkitBackgroundClip: "text",
+                             WebkitTextFillColor: "transparent",
+                             backgroundClip: "text",
+                           }}
+                         >
                           {carouselItems[currentSlide].title}
-                        </h1>
-                        <p className="text-lg text-zinc-600 font-light leading-relaxed max-w-md mx-auto">
-                          {carouselItems[currentSlide].description}
-                        </p>
+                        </motion.h1>
                         
-                        {/* Minimal CTA */}
+                        <motion.p 
+                          className="text-lg text-zinc-600 font-light leading-relaxed max-w-md mx-auto"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: 0.8 }}
+                        >
+                          {carouselItems[currentSlide].description}
+                        </motion.p>
+                        
+                        {/* Enhanced CTA with ripple effect */}
                         <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.6 }}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.6, delay: 1.0 }}
                           className="pt-4"
                         >
-                          <Button
-                            size="lg"
-                            className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-8 py-3 text-base font-medium border-0 shadow-xl transition-all duration-300 hover:scale-105"
-                            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                           >
-                            {carouselItems[currentSlide].cta}
-                          </Button>
+                            <Button
+                              size="lg"
+                              className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-8 py-3 text-base font-medium border-0 shadow-xl transition-all duration-300 relative overflow-hidden group"
+                              onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                            >
+                              <motion.div
+                                className="absolute inset-0 bg-white/20 rounded-full"
+                                initial={{ scale: 0, opacity: 0 }}
+                                whileHover={{ 
+                                  scale: 1, 
+                                  opacity: [0, 0.5, 0],
+                                  transition: { duration: 0.6 }
+                                }}
+                              />
+                              <span className="relative z-10">
+                                {carouselItems[currentSlide].cta}
+                              </span>
+                            </Button>
+                          </motion.div>
                         </motion.div>
                       </motion.div>
                     </div>
                   </div>
 
-                  {/* Desktop - Minimal Split */}
+                                      {/* Desktop - Advanced Parallax Split */}
                   <div className="hidden md:grid grid-cols-5 gap-16 items-center w-full h-full">
                     
-                    {/* Content - 2 columns */}
+                    {/* Enhanced Content - 2 columns */}
                     <motion.div
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.7, delay: 0.1 }}
-                      className="col-span-2 space-y-8"
+                      initial={{ opacity: 0, x: -60, rotateY: -15 }}
+                      animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                      transition={{ duration: 1.0, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="col-span-2 space-y-8 relative"
+                      style={{
+                        transformStyle: "preserve-3d"
+                      }}
                     >
-                      <div className="space-y-6">
+                      {/* Floating accent elements */}
+                      <motion.div
+                        className="absolute -top-10 -left-10 w-20 h-20 bg-gradient-to-br from-zinc-200/20 to-transparent rounded-full blur-xl"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 0.8, 0.5],
+                          x: [0, 10, -5, 0],
+                        }}
+                        transition={{
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
+                      
+                      <div className="space-y-6 relative">
                         <motion.h1 
-                          className="text-5xl xl:text-6xl font-light leading-[0.9] tracking-tight text-zinc-900"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.6, delay: 0.3 }}
+                          className="text-5xl xl:text-6xl font-light leading-[0.9] tracking-tight"
+                          initial={{ opacity: 0, y: 40, rotateX: 20 }}
+                          animate={{ 
+                            opacity: 1, 
+                            y: 0, 
+                            rotateX: 0,
+                          }}
+                          transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                          style={{
+                            background: "linear-gradient(135deg, #18181b 0%, #71717a 50%, #18181b 100%)",
+                            backgroundSize: "200% 100%",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                          }}
+                          whileHover={{
+                            scale: 1.02,
+                            transition: { duration: 0.3 }
+                          }}
                         >
-                          {carouselItems[currentSlide].title}
+                          <motion.span
+                            animate={{
+                              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                            }}
+                            transition={{
+                              duration: 8,
+                              repeat: Infinity,
+                              ease: "linear"
+                            }}
+                            style={{
+                              background: "inherit",
+                              backgroundSize: "inherit",
+                              WebkitBackgroundClip: "text",
+                              backgroundClip: "text",
+                            }}
+                          >
+                            {carouselItems[currentSlide].title}
+                          </motion.span>
                         </motion.h1>
                         
                         <motion.p 
-                          initial={{ opacity: 0, y: 15 }}
+                          initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.6, delay: 0.5 }}
-                          className="text-xl text-zinc-600 font-light leading-relaxed"
+                          transition={{ duration: 0.8, delay: 0.6 }}
+                          className="text-xl text-zinc-600 font-light leading-relaxed relative"
                         >
+                          <motion.span
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 1.2, delay: 0.8 }}
+                            className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-zinc-300 to-transparent"
+                          />
                           {carouselItems[currentSlide].description}
                         </motion.p>
                       </div>
 
-                      {/* Ultra minimal CTA */}
+                      {/* CTA with advanced effects */}
                       <motion.div
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.7 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 1.0 }}
+                        className="relative"
                       >
-                        <Button
-                          size="lg"
-                          className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-none px-8 py-4 text-sm tracking-wider uppercase font-light border-0 shadow-2xl transition-all duration-300 hover:shadow-xl"
-                          onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                        <motion.div
+                          whileHover={{ 
+                            scale: 1.05,
+                            rotateY: 5,
+                            transition: { duration: 0.4 }
+                          }}
+                          whileTap={{ scale: 0.98 }}
                         >
-                          {carouselItems[currentSlide].cta}
-                        </Button>
+                          <Button
+                            size="lg"
+                            className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-none px-8 py-4 text-sm tracking-wider uppercase font-light border-0 shadow-2xl transition-all duration-500 relative overflow-hidden group"
+                            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                          >
+                            {/* Shimmer effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                              initial={{ x: "-100%" }}
+                              whileHover={{ 
+                                x: "100%",
+                                transition: { duration: 0.8 }
+                              }}
+                            />
+                            
+                            {/* Pulse effect */}
+                            <motion.div
+                              className="absolute inset-0 bg-white/5 rounded-none"
+                              animate={{
+                                scale: [1, 1.05, 1],
+                                opacity: [0, 0.3, 0],
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            />
+                            
+                            <span className="relative z-10">
+                              {carouselItems[currentSlide].cta}
+                            </span>
+                          </Button>
+                        </motion.div>
                       </motion.div>
                     </motion.div>
 
-                    {/* Image - 3 columns */}
+                    {/* Enhanced 3D Image - 3 columns */}
                     <motion.div
-                      initial={{ opacity: 0, x: 30, scale: 0.97 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      transition={{ duration: 0.7, delay: 0.2 }}
-                      className="col-span-3 relative h-[550px] xl:h-[600px]"
+                      initial={{ 
+                        opacity: 0, 
+                        x: 80, 
+                        scale: 0.9,
+                        rotateY: 20,
+                        z: -100
+                      }}
+                      animate={{ 
+                        opacity: 1, 
+                        x: 0, 
+                        scale: 1,
+                        rotateY: 0,
+                        z: 0
+                      }}
+                      transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="col-span-3 relative h-[550px] xl:h-[600px] group"
+                      style={{
+                        transformStyle: "preserve-3d",
+                        perspective: "1000px"
+                      }}
+                      whileHover={{
+                        scale: 1.03,
+                        rotateY: -8,
+                        transition: { duration: 0.6, ease: "easeOut" }
+                      }}
                     >
-                      <div className="relative h-full w-full rounded-2xl overflow-hidden shadow-2xl">
-                        <Image
-                          src={carouselItems[currentSlide].image}
-                          alt={carouselItems[currentSlide].title}
-                          fill
-                          className="object-contain md:p-4 lg:p-6 group-hover:scale-105 transition-transform duration-700 ease-out"
+                      {/* Floating background elements */}
+                      {isClient && desktopParticlePositions.map((position, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute w-2 h-2 bg-zinc-300/30 rounded-full"
+                          style={{
+                            left: position.left,
+                            top: position.top,
+                          }}
+                          animate={{
+                            y: [0, -20, 0],
+                            opacity: [0.2, 0.8, 0.2],
+                            scale: [0.5, 1.5, 0.5],
+                          }}
+                          transition={{
+                            duration: 3 + (i * 0.4) % 3,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: (i * 0.25) % 2,
+                          }}
                         />
-                      </div>
+                      ))}
+                      
+                      <motion.div
+                        className="relative h-full w-full rounded-2xl overflow-hidden"
+                        style={{
+                          transformStyle: "preserve-3d"
+                        }}
+                      >
+                        {/* Advanced layered glow effects */}
+                        <motion.div
+                          className="absolute inset-0 rounded-2xl"
+                          style={{
+                            background: "linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent, rgba(255,255,255,0.05), transparent)",
+                            backgroundSize: "400% 400%"
+                          }}
+                          animate={{
+                            backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
+                          }}
+                          transition={{
+                            duration: 12,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        />
+                        
+                        <motion.div
+                          className="relative h-full w-full"
+                          whileHover={{
+                            z: 30,
+                            transition: { duration: 0.5 }
+                          }}
+                        >
+                          <ImageWithLoader
+                            src={carouselItems[currentSlide].image}
+                            alt={carouselItems[currentSlide].title}
+                            fill
+                            className="object-contain md:p-4 lg:p-6 group-hover:scale-110 transition-transform duration-1200 ease-out"
+                          />
+                        </motion.div>
+                        
+                        {/* Dynamic reflection effect */}
+                        <motion.div
+                          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100"
+                          style={{
+                            background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 50%)",
+                            filter: "blur(20px)"
+                          }}
+                          animate={{
+                            rotate: [0, 360],
+                          }}
+                          transition={{
+                            duration: 20,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        />
+                      </motion.div>
                     </motion.div>
                   </div>
                 </div>
@@ -760,7 +1141,7 @@ export default function LandingPage() {
             <div className="w-16 h-px bg-zinc-300 mx-auto"></div>
           </motion.div>
 
-          {/* Premium Desktop Search Interface for Fragancias */}
+          {/* Desktop Search Interface for Fragancias */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -821,7 +1202,7 @@ export default function LandingPage() {
                   <div className="absolute inset-px rounded-3xl bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
                 
-                {/* Premium search suggestions */}
+                {/* Search suggestions */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: search ? 1 : 0 }}
@@ -855,7 +1236,7 @@ export default function LandingPage() {
 
           {/* Loading State with skeleton cards */}
           {isLoading || isFiltering ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {Array.from({ length: 6 }).map((_, index) => (
                 <motion.div
                   key={`skeleton-${index}`}
@@ -866,7 +1247,7 @@ export default function LandingPage() {
                 >
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white">
                     {/* Skeleton image */}
-                    <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
+                    <div className="relative aspect-square sm:h-[380px] lg:h-[320px] overflow-hidden rounded-t-2xl">
                       <div className="w-full h-full bg-gradient-to-r from-zinc-200 via-zinc-100 to-zinc-200 bg-[length:200%_100%] animate-[shimmer_2s_ease-in-out_infinite]"></div>
                     </div>
                     
@@ -918,7 +1299,7 @@ export default function LandingPage() {
             </motion.div>
           ) : (
             /* Enhanced products grid */
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {filteredProducts.map((product, index) => (
                 <motion.div
                   key={getProductId(product)}
@@ -937,7 +1318,7 @@ export default function LandingPage() {
                 >
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white group-hover:shadow-xl transition-all duration-500 relative">
                     
-                    <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
+                    <div className="relative aspect-square sm:h-[380px] lg:h-[320px] overflow-hidden rounded-t-2xl">
                       <ImageWithLoader
                         src={getProductImage(product)}
                         alt={getProductName(product)}
@@ -1009,7 +1390,22 @@ export default function LandingPage() {
                           router.push(`/producto/${productId}?id=${productId}`)
                         }}
                       >
-                        Ver Información
+                        <motion.span
+                          className="flex items-center justify-center gap-2"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Ver Información
+                          <motion.svg 
+                            className="w-3 h-3" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                            animate={{ x: [0, 3, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </motion.svg>
+                        </motion.span>
                       </Button>
                     </CardContent>
                   </Card>
@@ -1040,7 +1436,7 @@ export default function LandingPage() {
             <div className="w-16 h-px bg-zinc-300 mx-auto"></div>
           </motion.div>
 
-          {/* Premium Desktop Search Interface for Decants */}
+          {/* Desktop Search Interface for Decants */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1101,7 +1497,7 @@ export default function LandingPage() {
                   <div className="absolute inset-px rounded-3xl bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
                 
-                {/* Premium search suggestions */}
+                {/* Search suggestions */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: searchDecants ? 1 : 0 }}
@@ -1135,7 +1531,7 @@ export default function LandingPage() {
 
           {/* Decants Grid */}
           {isLoadingDecants ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {Array.from({ length: 6 }).map((_, index) => (
                 <motion.div
                   key={`decant-skeleton-${index}`}
@@ -1146,7 +1542,7 @@ export default function LandingPage() {
                 >
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white">
                     {/* Skeleton image */}
-                    <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
+                    <div className="relative aspect-square sm:h-[380px] lg:h-[320px] overflow-hidden rounded-t-2xl">
                       <div className="w-full h-full bg-gradient-to-r from-zinc-200 via-zinc-100 to-zinc-200 bg-[length:200%_100%] animate-[shimmer_2s_ease-in-out_infinite]"></div>
                     </div>
                     
@@ -1208,7 +1604,7 @@ export default function LandingPage() {
             </motion.div>
           ) : (
             /* Enhanced decants grid using same style as fragancias */
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {filteredDecants.map((decant, index) => (
                 <motion.div
                   key={decant.id}
@@ -1227,7 +1623,7 @@ export default function LandingPage() {
                 >
                   <Card className="overflow-hidden border-0 shadow-lg h-full rounded-2xl bg-white group-hover:shadow-xl transition-all duration-500 relative">
                     
-                    <div className="relative aspect-square sm:h-[380px] lg:h-[400px] overflow-hidden rounded-t-2xl">
+                    <div className="relative aspect-square sm:h-[380px] lg:h-[320px] overflow-hidden rounded-t-2xl">
                       <ImageWithLoader
                         src={getDecantImage(decant)}
                         alt={getDecantName(decant)}
@@ -1310,7 +1706,22 @@ export default function LandingPage() {
                           router.push(`/decant/${decant.id}?id=${decant.id}`)
                         }}
                       >
-                        Ver Información
+                        <motion.span
+                          className="flex items-center justify-center gap-2"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Ver Información
+                          <motion.svg 
+                            className="w-3 h-3" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                            animate={{ x: [0, 3, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </motion.svg>
+                        </motion.span>
                       </Button>
                     </CardContent>
                   </Card>
@@ -1365,11 +1776,7 @@ export default function LandingPage() {
                     Ver Todas las Fragancias
                   </a>
                 </li>
-                <li>
-                  <a href="#products" className="text-zinc-500 hover:text-white transition-colors text-sm font-light">
-                    Perfumes Premium
-                  </a>
-                </li>
+
                 <li>
                   <a href="#products" className="text-zinc-500 hover:text-white transition-colors text-sm font-light">
                     Catálogo Completo

@@ -139,19 +139,19 @@ export function RelatedProducts({ currentProductId, currentProductType, maxProdu
       <h2 className="text-2xl font-light mb-12 text-center">También te puede interesar</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {relatedProducts.map((product) => (
-          <div key={getProductId(product)} className="group cursor-pointer" onClick={() => handleProductClick(product)}>
-            <div className="w-full h-[250px] bg-white border border-zinc-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center">
+          <div key={getProductId(product)} className="group cursor-pointer flex flex-col items-center md:items-start" onClick={() => handleProductClick(product)}>
+            <div className="w-full max-w-[280px] md:max-w-none h-[250px] bg-white border border-zinc-100 rounded-lg overflow-hidden mb-4 flex items-center justify-center mx-auto md:mx-0">
               <ImageWithLoader
                 src={getProductImage(product)}
                 alt={getProductName(product)}
                 width={250}
                 height={250}
-                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                className="max-w-[90%] max-h-[90%] object-contain group-hover:scale-105 transition-transform duration-300"
                 skeletonClassName="rounded-lg"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 text-center md:text-left w-full max-w-[280px] md:max-w-none mx-auto md:mx-0">
               <h3 className="text-base font-normal group-hover:text-zinc-600 transition-colors">
                 {getProductName(product)}
               </h3>
