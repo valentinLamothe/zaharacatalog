@@ -36,9 +36,9 @@ const carouselItems = [
   },
   {
     id: 3,
-    title: "Elegancia en cada esencia",
-    description: "Fragancias exclusivas que complementan tu personalidad con distinción",
-    image: "/catalogo_7.PNG",
+    title: "Club de Nuit: intensidad bajo cero.",
+    description: "Frescura potente con un estilo que deja huella. Elegante, profundo y siempre inolvidable.",
+    image: "https://i.imgur.com/VBflVVx.jpeg",
     cta: "Descubrir Fragancias",
   },
 ]
@@ -292,7 +292,7 @@ export default function LandingPage() {
       if (!isHovered || isMobile) { // En mobile siempre avanza automáticamente
         nextSlide()
       }
-    }, isMobile ? 3000 : 5000) // 3 segundos en mobile, 5 en desktop
+    }, 6000) // 6 segundos para móvil y desktop
     return () => clearInterval(interval)
   }, [nextSlide, isHovered])
 
